@@ -1,23 +1,22 @@
-// Import từ SillyTavern core
 import { extension_settings, getContext, loadExtensionSettings } from "../../../extensions.js";
 import { saveSettingsDebounced } from "../../../../script.js";
 
+// ⚠️ QUAN TRỌNG: Tên này phải trùng khớp 100% với tên folder bạn đặt trong third-party
 const extensionName = "simu-hud"; 
 const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 
-// Khởi tạo Extension
 jQuery(async () => {
-    console.log(`[${extensionName}] Loading...`);
+    // Nếu dòng này hiện ra trong Console thì code đã chạy
+    console.log(`[${extensionName}] Loading starting...`);
    
     try {
-        // Tải file HTML
         const settingsHtml = await $.get(`${extensionFolderPath}/example.html`);
-       
-        // Thêm vào cột bên phải (Extensions settings)
-        $("#extensions_settings2").append(settingsHtml);
-       
+        
+        // Thử append vào cả 2 nơi để chắc chắn nó xuất hiện ở đâu đó
+        $("#extensions_settings").append(settingsHtml); // Cột trái
+        
         console.log(`[${extensionName}] ✅ Loaded successfully`);
     } catch (error) {
-        console.error(`[${extensionName}] ❌ Failed to load:`, error);
+        console.error(`[${extensionName}] ❌ Failed to load HTML. Check if folder name is exactly '${extensionName}'`, error);
     }
 });
