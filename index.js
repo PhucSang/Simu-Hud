@@ -1,7 +1,7 @@
 import { extension_settings, loadExtensionSettings } from "../../../extensions.js";
 import { saveSettingsDebounced } from "../../../../script.js";
 
-const extensionName = "Simu-Hud"; // Đã sửa đúng chữ hoa chữ thường
+const extensionName = "Simu-Hud"; 
 const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 
 const defaultSettings = {
@@ -9,24 +9,28 @@ const defaultSettings = {
 };
 
 async function loadSettings() {
-    // Kiểm tra nếu settings của extension chưa tồn tại thì khởi tạo bằng default
     extension_settings[extensionName] = extension_settings[extensionName] || {};
-    
     if (Object.keys(extension_settings[extensionName]).length === 0) {
         Object.assign(extension_settings[extensionName], defaultSettings);
     }
-
-    // Cập nhật trạng thái checkbox trên UI dựa vào settings đã lưu
     $("#simu_hud_enabled").prop("checked", extension_settings[extensionName].isEnabled);
-    
-    console.log(`[${extensionName}] Settings loaded:`, extension_settings[extensionName]);
 }
 
 function onEnabledChange(event) {
     const value = Boolean($(event.target).prop("checked"));
     extension_settings[extensionName].isEnabled = value;
     saveSettingsDebounced();
-    console.log(`[${extensionName}] isEnabled changed to:`, value);
+}
+
+// --- NEW: Hàm xử lý khi bấm nút ---
+function onTestButtonClick() {
+    const isEnabled = extension_settings[extensionName].isEnabled;
+    // Hiển thị thông báo trong SillyTavern
+    toastr.info(
+        `Simu-Hud đang ở trạng thái: ${isEnabled ? "BẬT" : "TẮT"}`,
+        "Kiểm tra Simu-Hud"
+    );
+    console.log(`[${extensionName}] Nút Test đã được bấm!`);
 }
 
 jQuery(async () => {
@@ -36,10 +40,10 @@ jQuery(async () => {
         const settingsHtml = await $.get(`${extensionFolderPath}/example.html`);
         $("#extensions_settings2").append(settingsHtml);
        
-        // Bind sự kiện khi click checkbox
+        // Bind sự kiện
         $(document).on("input", "#simu_hud_enabled", onEnabledChange);
+        $(document).on("click", "#simu_hud_test_btn", onTestButtonClick); // NEW
        
-        // Load settings khi khởi động
         await loadSettings();
        
         console.log(`[${extensionName}] ✅ Loaded successfully`);
