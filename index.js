@@ -2,7 +2,7 @@ import { extension_settings, getContext, loadExtensionSettings } from "../../../
 import { saveSettingsDebounced } from "../../../../script.js";
 
 // ⚠️ QUAN TRỌNG: Tên này phải trùng khớp 100% với tên folder bạn đặt trong third-party
-const extensionName = "simu-hud"; 
+const extensionName = "Simu-Hud"; 
 const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 
 jQuery(async () => {
