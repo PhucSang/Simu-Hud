@@ -3,7 +3,7 @@ import { extension_settings, getContext, loadExtensionSettings } from "../../../
 import { saveSettingsDebounced } from "../../../../script.js";
 
 // Extension name MUST match folder name
-const extensionName = "extension-name"; // ⚠️ REPLACE WITH ACTUAL FOLDER NAME
+const extensionName = "Simu-Hud"; // ⚠️ REPLACE WITH ACTUAL FOLDER NAME
 const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 
 // Extension initialization
