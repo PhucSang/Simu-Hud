@@ -35,3 +35,8 @@
 .simu-hud-tab-content.active {
     display: block; /* Chỉ hiện tab đang được chọn */
 }
+
+/* Ẩn hoàn toàn thẻ simu-hud trên màn hình chat để không vỡ giao diện */
+simu-hud {
+    display: none !important;
+}
