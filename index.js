@@ -2,7 +2,7 @@
 import { extension_settings, getContext, loadExtensionSettings } from "../../../extensions.js";
 import { saveSettingsDebounced } from "../../../../script.js";
 
-const extensionName = "character-stats-manager"; 
+const extensionName = "simu-hud"; 
 const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 
 // Khởi tạo Extension
@@ -13,7 +13,7 @@ jQuery(async () => {
         // Tải file HTML
         const settingsHtml = await $.get(`${extensionFolderPath}/example.html`);
        
-        // Thêm vào cột bên phải của bảng Extensions
+        // Thêm vào cột bên phải (Extensions settings)
         $("#extensions_settings2").append(settingsHtml);
        
         console.log(`[${extensionName}] ✅ Loaded successfully`);
