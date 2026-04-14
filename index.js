@@ -1,19 +1,64 @@
 import { extension_settings } from "../../../extensions.js";
+import { eventSource, event_types } from "../../../../script.js";
+import { chat } from "../../../chat.js";
 
 const extensionName = "Simu-Hud"; 
 const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 
-// --- NEW: Logic chuyển Tab ---
+// Hàm cập nhật giao diện hiển thị
+function updateHudData(parsedData) {
+    if (parsedData.time) $("#sh_time").text(parsedData.time);
+    if (parsedData.date) $("#sh_date").text(parsedData.date);
+    if (parsedData.location) $("#sh_location").text(parsedData.location);
+    if (parsedData.brief) $("#sh_brief").text(parsedData.brief);
+    
+    // Hiệu ứng chớp nhẹ khi cập nhật
+    $(".sh-highlight, .sh-brief-box").fadeOut(100).fadeIn(100);
+    console.log(`[${extensionName}] Data updated from AI:`, parsedData);
+}
+
+// NEW: Hệ thống Đọc và Xóa tin nhắn ẩn
+function onMessageReceived() {
+    // Lấy tin nhắn cuối cùng trong đoạn chat
+    const lastMessage = chat[chat.length - 1];
+    if (!lastMessage || lastMessage.is_user) return; // Chỉ xử lý tin nhắn của bot
+
+    // Tìm khối <simu-hud> chứa code JSON
+    const regex = /<simu-hud>([\s\S]*?)<\/simu-hud>/i;
+    const match = lastMessage.mes.match(regex);
+
+    if (match) {
+        try {
+            // 1. Chuyển text thành dữ liệu JSON
+            const aiData = JSON.parse(match[1].trim());
+            
+            // 2. Cập nhật Menu UI
+            updateHudData(aiData);
+
+            // 3. XÓA khối <simu-hud> khỏi tin nhắn để giấu nó đi
+            lastMessage.mes = lastMessage.mes.replace(regex, "").trim();
+
+            // 4. Tìm phần tử HTML của tin nhắn đó trên màn hình và xóa nó (thay bằng text narrative)
+            const mesId = lastMessage.mesId;
+            const messageDom = $(`.mes[mesid="${mesId}"] .mes_text`);
+            if (messageDom.length) {
+                // Tạm thời hiển thị text dạng cơ bản (Sẽ render lại markdown chuẩn khi refresh)
+                messageDom.html(lastMessage.mes.replace(/\n/g, "<br>")); 
+            }
+
+            console.log(`[${extensionName}] Đã trích xuất và xóa HUD code thành công.`);
+        } catch (error) {
+            console.error(`[${extensionName}] ❌ Lỗi khi đọc JSON từ AI. Đảm bảo AI xuất đúng định dạng JSON.`, error);
+        }
+    }
+}
+
+// Chuyển Tab (Giữ nguyên)
 function onTabClick(event) {
-    // Tắt tất cả tab và nội dung đang sáng
     $(".simu-hud-tab").removeClass("active");
     $(".simu-hud-tab-content").removeClass("active");
-
-    // Bật tab vừa click
     const clickedTab = $(event.currentTarget);
     clickedTab.addClass("active");
-
-    // Bật nội dung tương ứng với tab đó
     const targetId = clickedTab.data("tab");
     $(`#tab-${targetId}`).addClass("active");
 }
@@ -23,10 +68,12 @@ jQuery(async () => {
         const settingsHtml = await $.get(`${extensionFolderPath}/example.html`);
         $("#extensions_settings2").append(settingsHtml);
        
-        // Bind sự kiện click cho các tab
         $(document).on("click", ".simu-hud-tab", onTabClick);
        
-        console.log(`[${extensionName}] ✅ Tabs loaded successfully`);
+        // NEW: Lắng nghe sự kiện ngay sau khi AI trả lời xong
+        eventSource.on(event_types.MESSAGE_RECEIVED, onMessageReceived);
+       
+        console.log(`[${extensionName}] ✅ Ready. Lắng nghe tag <simu-hud>...`);
     } catch (error) {
         console.error(`[${extensionName}] ❌ Failed to load:`, error);
     }
