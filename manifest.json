@@ -3,8 +3,6 @@
   "loading_order": 100,
   "requires": [],
   "optional": [],
-  "js": "index.js",
-  "css": "style.css",
   "author": "PhucSang",
   "version": "1.0.0",
   "homePage": "https://github.com/PhucSang/Simu-Hud"
