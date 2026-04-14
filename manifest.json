@@ -1,0 +1,11 @@
+{
+  "display_name": "Character Stats Manager",
+  "loading_order": 100,
+  "requires": [],
+  "optional": [],
+  "js": "index.js",
+  "css": "style.css",
+  "author": "Max & User",
+  "version": "1.0.0",
+  "homePage": ""
+}
