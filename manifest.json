@@ -1,8 +1,0 @@
-{
-    "display_name": "Simu-Hud Stats Manager",
-    "js": "index.js",
-    "css": "style.css",
-    "author": "PhucSang",
-    "version": "1.0.0",
-    "description": "Hiển thị menu quản lý HP, MP, Stamina qua icon nổi."
-}
