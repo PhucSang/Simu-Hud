@@ -1,52 +1,32 @@
-import { extension_settings, loadExtensionSettings } from "../../../extensions.js";
-import { saveSettingsDebounced } from "../../../../script.js";
+import { extension_settings } from "../../../extensions.js";
 
 const extensionName = "Simu-Hud"; 
 const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 
-const defaultSettings = {
-    isEnabled: true,
-};
+// --- NEW: Logic chuyển Tab ---
+function onTabClick(event) {
+    // Tắt tất cả tab và nội dung đang sáng
+    $(".simu-hud-tab").removeClass("active");
+    $(".simu-hud-tab-content").removeClass("active");
 
-async function loadSettings() {
-    extension_settings[extensionName] = extension_settings[extensionName] || {};
-    if (Object.keys(extension_settings[extensionName]).length === 0) {
-        Object.assign(extension_settings[extensionName], defaultSettings);
-    }
-    $("#simu_hud_enabled").prop("checked", extension_settings[extensionName].isEnabled);
-}
+    // Bật tab vừa click
+    const clickedTab = $(event.currentTarget);
+    clickedTab.addClass("active");
 
-function onEnabledChange(event) {
-    const value = Boolean($(event.target).prop("checked"));
-    extension_settings[extensionName].isEnabled = value;
-    saveSettingsDebounced();
-}
-
-// --- NEW: Hàm xử lý khi bấm nút ---
-function onTestButtonClick() {
-    const isEnabled = extension_settings[extensionName].isEnabled;
-    // Hiển thị thông báo trong SillyTavern
-    toastr.info(
-        `Simu-Hud đang ở trạng thái: ${isEnabled ? "BẬT" : "TẮT"}`,
-        "Kiểm tra Simu-Hud"
-    );
-    console.log(`[${extensionName}] Nút Test đã được bấm!`);
+    // Bật nội dung tương ứng với tab đó
+    const targetId = clickedTab.data("tab");
+    $(`#tab-${targetId}`).addClass("active");
 }
 
 jQuery(async () => {
-    console.log(`[${extensionName}] Loading...`);
-   
     try {
         const settingsHtml = await $.get(`${extensionFolderPath}/example.html`);
         $("#extensions_settings2").append(settingsHtml);
        
-        // Bind sự kiện
-        $(document).on("input", "#simu_hud_enabled", onEnabledChange);
-        $(document).on("click", "#simu_hud_test_btn", onTestButtonClick); // NEW
+        // Bind sự kiện click cho các tab
+        $(document).on("click", ".simu-hud-tab", onTabClick);
        
-        await loadSettings();
-       
-        console.log(`[${extensionName}] ✅ Loaded successfully`);
+        console.log(`[${extensionName}] ✅ Tabs loaded successfully`);
     } catch (error) {
         console.error(`[${extensionName}] ❌ Failed to load:`, error);
     }

@@ -1,22 +1,44 @@
 <div class="Simu-Hud-settings">
     <div class="inline-drawer">
         <div class="inline-drawer-toggle inline-drawer-header">
-            <b>Simu-Hud</b>
+            <b>Simu-Hud Dashboard</b>
             <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
         </div>
         <div class="inline-drawer-content">
-            <div class="flex-container justify-content-between">
-                <label for="simu_hud_enabled">Kích hoạt Simu-Hud</label>
-                <input id="simu_hud_enabled" type="checkbox" />
+            
+            <div class="simu-hud-tabs">
+                <div class="simu-hud-tab active" data-tab="context">Context</div>
+                <div class="simu-hud-tab" data-tab="stats">Stats</div>
+                <div class="simu-hud-tab" data-tab="inventory">Inventory</div>
+                <div class="simu-hud-tab" data-tab="goals">Goals</div>
+                <div class="simu-hud-tab" data-tab="system">System</div>
+            </div>
+
+            <div class="simu-hud-tab-content active" id="tab-context">
+                <h4>[CONTEXT & ENVIRONMENT]</h4>
+                <p><i>(Sẽ thêm ô nhập Time, Date, Location, Brief ở bước sau)</i></p>
             </div>
             
-            <hr />
-
-            <div class="flex-container">
-                <input id="simu_hud_test_btn" class="menu_button" type="submit" value="Kiểm tra trạng thái" />
+            <div class="simu-hud-tab-content" id="tab-stats">
+                <h4>[BASIC STATS & CONDITION]</h4>
+                <p><i>(Sẽ thêm Energy, Hunger, Hydration... ở bước sau)</i></p>
+            </div>
+            
+            <div class="simu-hud-tab-content" id="tab-inventory">
+                <h4>[INVENTORY & SURROUNDINGS]</h4>
+                <p><i>(Sẽ thêm Money, Items... ở bước sau)</i></p>
+            </div>
+            
+            <div class="simu-hud-tab-content" id="tab-goals">
+                <h4>[ACTIVE GOALS]</h4>
+                <p><i>(Sẽ thêm danh sách Goals ở bước sau)</i></p>
+            </div>
+            
+            <div class="simu-hud-tab-content" id="tab-system">
+                <h4>[SYSTEM ASSIST]</h4>
+                <p><i>(Sẽ thêm các Leads/Lựa chọn ở bước sau)</i></p>
             </div>
 
-            <p><small>Bấm nút trên để xem thông báo popup của SillyTavern.</small></p>
         </div>
     </div>
 </div>

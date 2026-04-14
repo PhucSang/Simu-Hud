@@ -1,0 +1,37 @@
+.simu-hud-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--SmartThemeBorderColor, #ccc);
+    padding-bottom: 5px;
+}
+
+.simu-hud-tab {
+    padding: 5px 10px;
+    cursor: pointer;
+    background: var(--SmartThemeQuoteColor, rgba(255,255,255,0.1));
+    border-radius: 5px;
+    font-size: 0.9em;
+    transition: background 0.2s;
+}
+
+.simu-hud-tab:hover {
+    background: var(--SmartThemeHoverColor, rgba(255,255,255,0.2));
+}
+
+.simu-hud-tab.active {
+    background: var(--SmartThemeBlurTintColor, rgba(0, 153, 255, 0.5));
+    font-weight: bold;
+}
+
+.simu-hud-tab-content {
+    display: none; /* Ẩn đi mặc định */
+    padding: 10px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+
+.simu-hud-tab-content.active {
+    display: block; /* Chỉ hiện tab đang được chọn */
+}
