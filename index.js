@@ -111,13 +111,13 @@ function onTabClick(event) {
 }
 
 async function generateHudData() {
-    const { generateRaw } = SillyTavern.getContext();
+    const { generateQuietPrompt } = SillyTavern.getContext();
     
     try {
         toastr.info("Đang tạo dữ liệu HUD...", "Simu-Hud");
         
-        const rawResult = await generateRaw({
-            prompt: hudPrompt,
+        const rawResult = await generateQuietPrompt({
+            quietPrompt: hudPrompt,
             jsonSchema: hudSchema,
         });
         
