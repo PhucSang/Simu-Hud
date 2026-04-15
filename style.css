@@ -1,0 +1,99 @@
+.simu-hud-menu {
+    margin-top: 10px;
+    border: 1px solid var(--SmartThemeBorderColor, #3c3c3c);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--SmartThemeBlurTintColor, #1a1a1a);
+}
+
+.simu-hud-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 12px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    letter-spacing: 2px;
+}
+
+.simu-hud-nav {
+    display: flex;
+    flex-wrap: wrap;
+    background: var(--SmartThemeBlurTintColor, #2a2a2a);
+    border-bottom: 1px solid var(--SmartThemeBorderColor, #3c3c3c);
+}
+
+.simu-hud-tab {
+    flex: 1;
+    min-width: 120px;
+    padding: 8px 4px;
+    background: transparent;
+    border: none;
+    color: var(--SmartThemeBodyColor, #ccc);
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.simu-hud-tab:hover {
+    background: rgba(102, 126, 234, 0.2);
+    color: #fff;
+}
+
+.simu-hud-tab.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+}
+
+.simu-hud-content {
+    padding: 12px;
+}
+
+.simu-hud-panel {
+    display: none;
+}
+
+.simu-hud-panel.active {
+    display: block;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    color: #667eea;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.stat-value {
+    color: var(--SmartThemeBodyColor, #ccc);
+    font-size: 12px;
+    text-align: right;
+    flex: 1;
+    margin-left: 10px;
+}
+
+.lead-item {
+    padding: 6px 8px;
+    margin: 4px 0;
+    background: rgba(102, 126, 234, 0.15);
+    border-radius: 4px;
+    color: var(--SmartThemeBodyColor, #ccc);
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.lead-item:hover {
+    background: rgba(102, 126, 234, 0.3);
+}

@@ -33,6 +33,17 @@ function onTestButtonClick() {
     console.log(`[${extensionName}] Nút Test đã được bấm!`);
 }
 
+function onTabClick(event) {
+    const tab = $(event.target);
+    const tabId = tab.data("tab");
+    
+    $(".simu-hud-tab").removeClass("active");
+    tab.addClass("active");
+    
+    $(".simu-hud-panel").removeClass("active");
+    $(`#panel-${tabId}`).addClass("active");
+}
+
 jQuery(async () => {
     console.log(`[${extensionName}] Loading...`);
    
@@ -42,7 +53,8 @@ jQuery(async () => {
        
         // Bind sự kiện
         $(document).on("input", "#simu_hud_enabled", onEnabledChange);
-        $(document).on("click", "#simu_hud_test_btn", onTestButtonClick); // NEW
+        $(document).on("click", "#simu_hud_test_btn", onTestButtonClick);
+        $(document).on("click", ".simu-hud-tab", onTabClick);
        
         await loadSettings();
        
