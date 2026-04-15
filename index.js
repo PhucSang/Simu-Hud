@@ -108,8 +108,6 @@ function updateHudDisplay(data) {
 }
 
 function sendLead(leadText) {
-    console.log(`[${extensionName}] Sending lead:`, leadText);
-    
     $("#send_textarea").val(leadText);
     $("#send_but").click();
 }
@@ -117,10 +115,6 @@ function sendLead(leadText) {
 globalThis.simuHudInterceptor = function(chat, contextSize, abort, type) {
     return;
 };
-
-function hideHudBlockFromMessage(message) {
-    return message.replace(/```hud\s*[\s\S]*?\s*```/g, '').trim();
-}
 
 jQuery(async () => {
     console.log(`[${extensionName}] Loading...`);
@@ -149,20 +143,6 @@ jQuery(async () => {
                     const { chat } = SillyTavern.getContext();
                     if (chat && chat[messageId] && !chat[messageId].is_user) {
                         parseAndUpdateHud(chat[messageId].mes);
-                        chat[messageId].mes = hideHudBlockFromMessage(chat[messageId].mes);
-                    }
-                }
-            });
-            
-            eventSource.on(event_types.CHARACTER_MESSAGE_RENDERED, (messageId) => {
-                if (extension_settings[extensionName].isEnabled) {
-                    const mesBlock = $(`#chat .mes[mesid="${messageId}"]`);
-                    if (mesBlock.length) {
-                        const mesText = mesBlock.find('.mes_text');
-                        if (mesText.length) {
-                            const cleaned = hideHudBlockFromMessage(mesText.html());
-                            mesText.html(cleaned);
-                        }
                     }
                 }
             });
