@@ -8,6 +8,78 @@ const defaultSettings = {
     isEnabled: true,
 };
 
+const hudSchema = {
+    name: 'SimuHudState',
+    description: 'A schema for simulation HUD state tracking.',
+    strict: true,
+    value: {
+        '$schema': 'http://json-schema.org/draft-04/schema#',
+        'type': 'object',
+        'properties': {
+            'context': {
+                'type': 'object',
+                'properties': {
+                    'time': { 'type': 'string' },
+                    'date': { 'type': 'string' },
+                    'location': { 'type': 'string' },
+                    'brief': { 'type': 'string' }
+                },
+                'required': ['time', 'date', 'location', 'brief']
+            },
+            'stats': {
+                'type': 'object',
+                'properties': {
+                    'energy': { 'type': 'string' },
+                    'nourishment': { 'type': 'string' },
+                    'hydration': { 'type': 'string' },
+                    'hygiene': { 'type': 'string' },
+                    'status': { 'type': 'string' }
+                },
+                'required': ['energy', 'nourishment', 'hydration', 'hygiene', 'status']
+            },
+            'inventory': {
+                'type': 'object',
+                'properties': {
+                    'money': { 'type': 'string' },
+                    'carrying': { 'type': 'string' },
+                    'nearbyObjects': { 'type': 'string' }
+                },
+                'required': ['money', 'carrying', 'nearbyObjects']
+            },
+            'goals': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'name': { 'type': 'string' },
+                        'description': { 'type': 'string' },
+                        'deadline': { 'type': 'string' }
+                    },
+                    'required': ['name', 'description', 'deadline']
+                }
+            },
+            'assist': {
+                'type': 'object',
+                'properties': {
+                    'leads': {
+                        'type': 'array',
+                        'items': { 'type': 'string' }
+                    }
+                },
+                'required': ['leads']
+            }
+        },
+        'required': ['context', 'stats', 'inventory', 'goals', 'assist']
+    }
+};
+
+const hudPrompt = `Analyze the current roleplay context and generate HUD state data as JSON. Include:
+- Context: current time, date, location, brief situation summary
+- Stats: energy (current/max), nourishment %, hydration %, hygiene %, physical/mental status
+- Inventory: money amount with currency, items being carried, notable nearby objects
+- Goals: 1-3 active goals with name, description, and deadline/countdown
+- Assist: 4 suggested action/dialogue options for the player`;
+
 async function loadSettings() {
     extension_settings[extensionName] = extension_settings[extensionName] || {};
     if (Object.keys(extension_settings[extensionName]).length === 0) {
@@ -24,13 +96,7 @@ function onEnabledChange(event) {
 
 // --- NEW: Hàm xử lý khi bấm nút ---
 function onTestButtonClick() {
-    const isEnabled = extension_settings[extensionName].isEnabled;
-    // Hiển thị thông báo trong SillyTavern
-    toastr.info(
-        `Simu-Hud đang ở trạng thái: ${isEnabled ? "BẬT" : "TẮT"}`,
-        "Kiểm tra Simu-Hud"
-    );
-    console.log(`[${extensionName}] Nút Test đã được bấm!`);
+    generateHudData();
 }
 
 function onTabClick(event) {
@@ -42,6 +108,82 @@ function onTabClick(event) {
     
     $(".simu-hud-panel").removeClass("active");
     $(`#panel-${tabId}`).addClass("active");
+}
+
+async function generateHudData() {
+    const { generateRaw } = SillyTavern.getContext();
+    
+    try {
+        toastr.info("Đang tạo dữ liệu HUD...", "Simu-Hud");
+        
+        const rawResult = await generateRaw({
+            prompt: hudPrompt,
+            jsonSchema: hudSchema,
+        });
+        
+        const parsed = JSON.parse(rawResult);
+        
+        if (parsed && Object.keys(parsed).length > 0) {
+            updateHudDisplay(parsed);
+            toastr.success("Đã cập nhật HUD!", "Simu-Hud");
+            return parsed;
+        } else {
+            toastr.warning("Không nhận được dữ liệu hợp lệ", "Simu-Hud");
+            return null;
+        }
+    } catch (error) {
+        console.error(`[${extensionName}] Lỗi generate HUD:`, error);
+        toastr.error("Lỗi khi tạo dữ liệu HUD", "Simu-Hud");
+        return null;
+    }
+}
+
+function updateHudDisplay(data) {
+    if (data.context) {
+        $("#panel-context .stat-value").eq(0).text(data.context.time || "--:-- --");
+        $("#panel-context .stat-value").eq(1).text(data.context.date || "--, --/--/----");
+        $("#panel-context .stat-value").eq(2).text(data.context.location || "Unknown");
+        $("#panel-context .stat-value").eq(3).text(data.context.brief || "No information");
+    }
+    
+    if (data.stats) {
+        $("#panel-stats .stat-value").eq(0).text(data.stats.energy || "--/--");
+        $("#panel-stats .stat-value").eq(1).text(data.stats.nourishment || "--%");
+        $("#panel-stats .stat-value").eq(2).text(data.stats.hydration || "--%");
+        $("#panel-stats .stat-value").eq(3).text(data.stats.hygiene || "--%");
+        $("#panel-stats .stat-value").eq(4).text(data.stats.status || "Unknown");
+    }
+    
+    if (data.inventory) {
+        $("#panel-inventory .stat-value").eq(0).text(data.inventory.money || "0");
+        $("#panel-inventory .stat-value").eq(1).text(data.inventory.carrying || "Nothing");
+        $("#panel-inventory .stat-value").eq(2).text(data.inventory.nearbyObjects || "None");
+    }
+    
+    if (data.goals && Array.isArray(data.goals)) {
+        const goalsPanel = $("#panel-goals");
+        goalsPanel.empty();
+        data.goals.forEach((goal, index) => {
+            goalsPanel.append(`
+                <div class="stat-row">
+                    <span class="stat-label">Goal ${index + 1}:</span>
+                    <span class="stat-value">${goal.description || goal.name} (${goal.deadline || "No deadline"})</span>
+                </div>
+            `);
+        });
+        if (data.goals.length === 0) {
+            goalsPanel.append(`<div class="stat-row"><span class="stat-value">None</span></div>`);
+        }
+    }
+    
+    if (data.assist && data.assist.leads) {
+        const assistPanel = $("#panel-assist");
+        assistPanel.empty();
+        assistPanel.append(`<div class="stat-row"><span class="stat-label">Leads:</span></div>`);
+        data.assist.leads.forEach((lead, index) => {
+            assistPanel.append(`<div class="lead-item">${index + 1}. ${lead}</div>`);
+        });
+    }
 }
 
 jQuery(async () => {
