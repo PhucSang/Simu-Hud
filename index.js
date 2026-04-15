@@ -1,5 +1,4 @@
 import { getContext, extension_settings } from "../../../extensions.js";
-// Thêm setExtensionPrompt từ SillyTavern API
 import { eventSource, event_types, setExtensionPrompt } from "../../../../script.js";
 
 const extensionName = "Simu-Hud"; 
@@ -14,92 +13,95 @@ function updateUIAndSave(d) {
     extension_settings[extensionName].data = { ...extension_settings[extensionName].data, ...d };
     const data = extension_settings[extensionName].data;
     
+    // Cập nhật DOM (giữ nguyên logic cũ)
     $("#sh_time").text(data.time || "--:--");
     $("#sh_date").text(data.date || "--");
     $("#sh_location").text(data.location || "Unknown");
-    $("#sh_brief").text(data.brief || "Waiting for AI...");
-    $("#sh_status").text(data.status || "Healthy");
+    $("#sh_brief").text(data.brief || "...");
+    $("#sh_status").text(data.status || "Normal");
     $("#sh_money").text(data.money || "0");
-    $("#sh_carrying").text(data.carrying || "Nothing");
-    $("#sh_nearby").text(data.nearby || "Nothing");
+    $("#sh_carrying").text(data.carrying || "None");
+    $("#sh_nearby").text(data.nearby || "None");
     $("#sh_goals").text(data.goals || "None");
-    $("#sh_leads").text(data.leads || "No leads.");
+    $("#sh_leads").text(data.leads || "None.");
 
-    if (data.energy && data.energy_max) {
-        $("#sh_energy_val").text(`${data.energy}/${data.energy_max}`);
-        $("#sh_energy_bar").css("width", `${(data.energy/data.energy_max)*100}%`);
+    if (data.energy) {
+        $("#sh_energy_val").text(`${data.energy}/${data.energy_max || 100}`);
+        $("#sh_energy_bar").css("width", `${(data.energy/(data.energy_max || 100))*100}%`);
     }
-    if (data.nourishment !== undefined) {
+    if (data.nourishment) {
         $("#sh_nourish_val").text(data.nourishment + "%");
         $("#sh_nourish_bar").css("width", data.nourishment + "%");
     }
-    if (data.hydration !== undefined) {
+    if (data.hydration) {
         $("#sh_hydra_val").text(data.hydration + "%");
         $("#sh_hydra_bar").css("width", data.hydration + "%");
     }
-    console.log(`[${extensionName}] UI Updated.`);
 }
 
-// HÀM TIÊM PROMPT CHUẨN (Được gọi liên tục mỗi khi đổi chat hoặc có tin nhắn mới)
+// HÀM TIÊM PROMPT - Cải tiến theo tài liệu ST
 function updateHiddenPrompt() {
     const context = getContext();
     if (!context || !context.chat) return;
     
-    // Nếu chat chỉ có 0 hoặc 1 tin nhắn (Mới tạo)
     const isNewChat = context.chat.length <= 1; 
     const data = extension_settings[extensionName].data;
 
-    let injection = `[SYSTEM: SIMULATION ENGINE]\n`;
+    // Sử dụng định dạng rành mạch hơn cho AI
+    let injection = `\n\n[SIMULATION DATA BOX]\n`;
     if (isNewChat) {
-        injection += `NEW SESSION. Based on the scenario and opening message, INITIALIZE all RPG stats logically.\n`;
+        injection += `ACTION: Initialize all RPG stats for a new session.\n`;
     } else {
-        injection += `CURRENT HUD STATS: Time:${data.time||"N/A"}, Loc:${data.location||"N/A"}, Energy:${data.energy||0}/${data.energy_max||100}, Nourishment:${data.nourishment||0}%, Hydration:${data.hydration||0}%, Status:${data.status||"N/A"}, Money:${data.money||0}, Items:${data.carrying||"None"}.\n`;
+        injection += `LAST KNOWN STATS: Time:${data.time}, Location:${data.location}, Energy:${data.energy}%, Items:${data.carrying}.\n`;
     }
     
-    // Khuôn dập bắt buộc
-    injection += `CRITICAL RULE: At the absolute end of your response, output the new state wrapped EXACTLY in <simu-hud>{...}</simu-hud> tags using valid JSON. Template: {"time":"","date":"","location":"","brief":"","energy":100,"energy_max":100,"nourishment":100,"hydration":100,"hygiene":100,"status":"","money":"","carrying":"","nearby":"","goals":"","leads":""}`;
+    injection += `INSTRUCTION: You MUST update these stats based on the narrative. 
+At the END of your response, attach the data using this EXACT format:
+<simu-hud>
+{"time":"...","date":"...","location":"...","brief":"...","energy":100,"energy_max":100,"nourishment":100,"hydration":100,"hygiene":100,"status":"...","money":"...","carrying":"...","nearby":"...","goals":"...","leads":"..."}
+</simu-hud>`;
 
-    // Sử dụng API chính thức của ST để tiêm prompt ẩn
-    // setExtensionPrompt(Tên_ID, Nội_dung, Vị_trí(1=In_Chat), Độ_sâu(0=Sát_đáy), Vai_trò(0=System))
-    if (typeof setExtensionPrompt === "function") {
-        setExtensionPrompt("SimuHud_Injection", injection, 1, 0, 0);
-        console.log(`[${extensionName}] 💉 Đã chèn thành công Prompt ẩn bằng API ST.`);
-    } else {
-        console.error(`[${extensionName}] Lỗi: Hàm setExtensionPrompt không tồn tại!`);
-    }
+    // Tiêm vào vị trí Depth 0 (sát nút tin nhắn cuối) để AI không thể quên
+    setExtensionPrompt("SimuHud_Injection", injection, 1, 0, 0);
 }
 
-// Bắt và xử lý JSON
-function handleMessageReceived() {
+// Xử lý tin nhắn - Thêm delay nhỏ để đảm bảo UI đã load
+async function handleMessageReceived() {
+    // Đợi 100ms để SillyTavern render xong tin nhắn ra màn hình
+    await new Promise(r => setTimeout(r, 100));
+
     const context = getContext();
     const lastMes = context.chat[context.chat.length - 1];
     if (!lastMes || lastMes.is_user) return;
 
-    console.log(`[${extensionName}] Đang quét tin nhắn...`);
     const regex = /<simu-hud>([\s\S]*?)<\/simu-hud>/i;
     const match = lastMes.mes.match(regex);
 
     if (match) {
         try {
             const parsedData = JSON.parse(match[1].trim());
-            console.log(`[${extensionName}] ✅ Tìm thấy JSON hợp lệ!`);
+            console.log(`[${extensionName}] 🎯 Bắt được dữ liệu!`);
             updateUIAndSave(parsedData);
             
-            // Xóa tag khỏi UI
+            // Xóa tag khỏi UI bằng cách cập nhật lại message
             lastMes.mes = lastMes.mes.replace(regex, "").trim();
-            $(".mes_text:last").html(lastMes.mes.replace(/\n/g, "<br>"));
+            
+            // Ép SillyTavern vẽ lại tin nhắn vừa được làm sạch
+            const messageDom = $(`.mes:last .mes_text`);
+            if (messageDom.length) {
+                // Sử dụng render chuẩn của ST nếu có thể, hoặc đơn giản là text
+                messageDom.text(lastMes.mes); 
+            }
         } catch (e) { 
-            console.error(`[${extensionName}] ❌ JSON Parse Error:`, e); 
+            console.error(`[${extensionName}] JSON Error:`, e); 
         }
     } else {
-        console.warn(`[${extensionName}] ⚠️ AI bỏ quên thẻ <simu-hud>!`);
+        console.warn(`[${extensionName}] AI không xuất thẻ <simu-hud>. Hãy kiểm tra lại Prompt trong menu (A).`);
     }
-    
-    // Cập nhật lại Prompt ẩn sau khi đã có dữ liệu mới
     updateHiddenPrompt();
 }
 
-// Logic chuyển tab Menu
+// Chuyển tab
 $(document).on("click", ".sh-tab", function() {
     $(".sh-tab").removeClass("active");
     $(".sh-content").removeClass("active");
@@ -110,16 +112,12 @@ $(document).on("click", ".sh-tab", function() {
 jQuery(async () => {
     const html = await $.get(`${extensionFolderPath}/example.html`);
     $("#extensions_settings2").append(html);
-    
-    // Load UI từ bộ nhớ
     updateUIAndSave(extension_settings[extensionName].data);
     
-    // Lắng nghe các sự kiện để nhồi prompt liên tục
     eventSource.on(event_types.CHAT_CHANGED, updateHiddenPrompt);
     eventSource.on(event_types.MESSAGE_SENT, updateHiddenPrompt);
     eventSource.on(event_types.MESSAGE_RECEIVED, handleMessageReceived);
     
-    // Tiêm lần đầu tiên khi mở app
     updateHiddenPrompt();
-    console.log("[Simu-Hud] ✅ Hệ thống chạy API chuẩn đã sẵn sàng.");
+    console.log("[Simu-Hud] Dashboard v2.1 Active");
 });
