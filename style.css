@@ -125,8 +125,8 @@
 /* --- Nút Bong bóng nổi (Bubble Icon) --- */
 #simu-hud-fab {
     position: fixed !important;
-    top: 150px !important;
-    right: 20px !important;
+    top: 150px;
+    right: 20px;
     width: 50px !important;
     height: 50px !important;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
