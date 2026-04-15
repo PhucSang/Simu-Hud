@@ -110,25 +110,27 @@ function updateHudDisplay(data) {
         assistPanel.empty();
         assistPanel.append(`<div class="stat-row"><span class="stat-label">Leads:</span></div>`);
         data.assist.leads.forEach((lead, index) => {
-            const leadItem = $(`<div class="lead-item">${index + 1}. ${lead}</div>`);
-            leadItem.on('click', () => sendLead(lead));
+            const leadItem = $(`<div class="lead-item" data-lead="${lead.replace(/"/g, '&quot;')}">${index + 1}. ${lead}</div>`);
             assistPanel.append(leadItem);
         });
     }
 }
 
-async function sendLead(leadText) {
+function sendLead(leadText) {
     const context = SillyTavern.getContext();
+    console.log(`[${extensionName}] Sending lead:`, leadText);
     
-    try {
-        if (context.send_textarea && context.send_but) {
-            context.send_textarea.val(leadText);
-            context.send_textarea.trigger('input');
-            await new Promise(r => setTimeout(r, 50));
-            context.send_but.trigger('click');
-        }
-    } catch (e) {
-        console.error(`[${extensionName}] Error sending lead:`, e);
+    if (context.send_textarea) {
+        context.send_textarea.val(leadText);
+        context.send_textarea.trigger('input');
+        
+        setTimeout(() => {
+            if (context.send_but) {
+                context.send_but.click();
+            }
+        }, 100);
+    } else {
+        console.error(`[${extensionName}] send_textarea not found`);
     }
 }
 
@@ -161,6 +163,12 @@ jQuery(async () => {
         $(document).on("input", "#simu_hud_enabled", onEnabledChange);
         $(document).on("click", "#simu_hud_test_btn", onTestButtonClick);
         $(document).on("click", ".simu-hud-tab", onTabClick);
+        $(document).on("click", ".lead-item", function() {
+            const leadText = $(this).data('lead');
+            if (leadText) {
+                sendLead(leadText);
+            }
+        });
        
         await loadSettings();
        
