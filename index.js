@@ -8,6 +8,15 @@ const defaultSettings = {
     isEnabled: true,
 };
 
+const HUD_INSTRUCTION = `[SIMU-HUD OUTPUT]
+At the end of EVERY response, append a JSON block with current simulation state:
+
+\`\`\`hud
+{"context":{"time":"HH:MM AM/PM","date":"Day, DD/MM/YYYY","location":"Current location","brief":"1-2 sentence summary"},"stats":{"energy":"X/Max","nourishment":"X%","hydration":"X%","hygiene":"X%","status":"Current physical/mental state"},"inventory":{"money":"Amount Currency","carrying":"Items in pockets","nearbyObjects":"Notable nearby items"},"goals":[{"name":"Goal name","description":"Brief description","deadline":"Time left"}],"assist":{"leads":["Action/Dialogue option 1","Action/Dialogue option 2","Action/Dialogue option 3","Action/Dialogue option 4"]}}
+\`\`\`
+
+Update stats based on actions. Use your system prompt rules for calculations.`;
+
 async function loadSettings() {
     extension_settings[extensionName] = extension_settings[extensionName] || {};
     if (Object.keys(extension_settings[extensionName]).length === 0) {
@@ -113,7 +122,18 @@ function sendLead(leadText) {
 }
 
 globalThis.simuHudInterceptor = function(chat, contextSize, abort, type) {
-    return;
+    if (!extension_settings[extensionName]?.isEnabled) return;
+    if (type === 'quiet' || type === 'impersonate') return;
+    
+    const hudSystemMessage = {
+        is_user: false,
+        is_system: true,
+        name: 'System',
+        mes: HUD_INSTRUCTION,
+        send_date: Date.now()
+    };
+    
+    chat.push(hudSystemMessage);
 };
 
 jQuery(async () => {
