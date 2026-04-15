@@ -124,22 +124,25 @@
 
 /* --- Nút Bong bóng nổi (Bubble Icon) --- */
 #simu-hud-fab {
-    position: fixed;
-    bottom: 120px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 50%;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-    cursor: pointer;
-    z-index: 999999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 24px;
-    user-select: none;
+    position: fixed !important;
+    top: 150px !important;
+    right: 20px !important;
+    width: 50px !important;
+    height: 50px !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border-radius: 50% !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important;
+    cursor: pointer !important;
+    z-index: 2147483647 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: white !important;
+    font-size: 24px !important;
+    user-select: none !important;
+    touch-action: none !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
