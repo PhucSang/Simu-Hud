@@ -169,20 +169,6 @@ jQuery(async () => {
                     const { chat } = SillyTavern.getContext();
                     if (chat && chat[messageId] && !chat[messageId].is_user) {
                         parseAndUpdateHud(chat[messageId].mes);
-                        chat[messageId].mes = hideHudBlockFromMessage(chat[messageId].mes);
-                    }
-                }
-            });
-            
-            eventSource.on(event_types.CHARACTER_MESSAGE_RENDERED, (messageId) => {
-                if (extension_settings[extensionName].isEnabled) {
-                    const mesBlock = $(`#chat .mes[mesid="${messageId}"]`);
-                    if (mesBlock.length) {
-                        const mesText = mesBlock.find('.mes_text');
-                        if (mesText.length) {
-                            const cleaned = hideHudBlockFromMessage(mesText.html());
-                            mesText.html(cleaned);
-                        }
                     }
                 }
             });
