@@ -117,21 +117,10 @@ function updateHudDisplay(data) {
 }
 
 function sendLead(leadText) {
-    const context = SillyTavern.getContext();
     console.log(`[${extensionName}] Sending lead:`, leadText);
     
-    if (context.send_textarea) {
-        context.send_textarea.val(leadText);
-        context.send_textarea.trigger('input');
-        
-        setTimeout(() => {
-            if (context.send_but) {
-                context.send_but.click();
-            }
-        }, 100);
-    } else {
-        console.error(`[${extensionName}] send_textarea not found`);
-    }
+    $("#send_textarea").val(leadText);
+    $("#send_but").click();
 }
 
 globalThis.simuHudInterceptor = function(chat, contextSize, abort, type) {
