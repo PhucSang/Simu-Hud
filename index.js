@@ -117,12 +117,18 @@ function updateHudDisplay(data) {
     }
 }
 
-function sendLead(leadText) {
-    const { send_textarea, send_but } = SillyTavern.getContext();
+async function sendLead(leadText) {
+    const context = SillyTavern.getContext();
     
-    if (send_textarea && send_but) {
-        send_textarea.val(leadText);
-        send_but.click();
+    try {
+        if (context.send_textarea && context.send_but) {
+            context.send_textarea.val(leadText);
+            context.send_textarea.trigger('input');
+            await new Promise(r => setTimeout(r, 50));
+            context.send_but.trigger('click');
+        }
+    } catch (e) {
+        console.error(`[${extensionName}] Error sending lead:`, e);
     }
 }
 
