@@ -114,8 +114,6 @@ async function generateHudData() {
     const { generateQuietPrompt } = SillyTavern.getContext();
     
     try {
-        toastr.info("Đang tạo dữ liệu HUD...", "Simu-Hud");
-        
         const rawResult = await generateQuietPrompt({
             quietPrompt: hudPrompt,
             jsonSchema: hudSchema,
@@ -125,15 +123,11 @@ async function generateHudData() {
         
         if (parsed && Object.keys(parsed).length > 0) {
             updateHudDisplay(parsed);
-            toastr.success("Đã cập nhật HUD!", "Simu-Hud");
             return parsed;
-        } else {
-            toastr.warning("Không nhận được dữ liệu hợp lệ", "Simu-Hud");
-            return null;
         }
+        return null;
     } catch (error) {
         console.error(`[${extensionName}] Lỗi generate HUD:`, error);
-        toastr.error("Lỗi khi tạo dữ liệu HUD", "Simu-Hud");
         return null;
     }
 }
@@ -202,9 +196,9 @@ jQuery(async () => {
         const { eventSource, event_types } = SillyTavern.getContext();
         
         if (eventSource && event_types) {
-            eventSource.on(event_types.MESSAGE_RECEIVED, async () => {
+            eventSource.on(event_types.GENERATION_ENDED, () => {
                 if (extension_settings[extensionName].isEnabled) {
-                    await generateHudData();
+                    generateHudData();
                 }
             });
         }
