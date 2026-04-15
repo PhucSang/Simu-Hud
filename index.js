@@ -8,77 +8,14 @@ const defaultSettings = {
     isEnabled: true,
 };
 
-const hudSchema = {
-    name: 'SimuHudState',
-    description: 'A schema for simulation HUD state tracking.',
-    strict: true,
-    value: {
-        '$schema': 'http://json-schema.org/draft-04/schema#',
-        'type': 'object',
-        'properties': {
-            'context': {
-                'type': 'object',
-                'properties': {
-                    'time': { 'type': 'string' },
-                    'date': { 'type': 'string' },
-                    'location': { 'type': 'string' },
-                    'brief': { 'type': 'string' }
-                },
-                'required': ['time', 'date', 'location', 'brief']
-            },
-            'stats': {
-                'type': 'object',
-                'properties': {
-                    'energy': { 'type': 'string' },
-                    'nourishment': { 'type': 'string' },
-                    'hydration': { 'type': 'string' },
-                    'hygiene': { 'type': 'string' },
-                    'status': { 'type': 'string' }
-                },
-                'required': ['energy', 'nourishment', 'hydration', 'hygiene', 'status']
-            },
-            'inventory': {
-                'type': 'object',
-                'properties': {
-                    'money': { 'type': 'string' },
-                    'carrying': { 'type': 'string' },
-                    'nearbyObjects': { 'type': 'string' }
-                },
-                'required': ['money', 'carrying', 'nearbyObjects']
-            },
-            'goals': {
-                'type': 'array',
-                'items': {
-                    'type': 'object',
-                    'properties': {
-                        'name': { 'type': 'string' },
-                        'description': { 'type': 'string' },
-                        'deadline': { 'type': 'string' }
-                    },
-                    'required': ['name', 'description', 'deadline']
-                }
-            },
-            'assist': {
-                'type': 'object',
-                'properties': {
-                    'leads': {
-                        'type': 'array',
-                        'items': { 'type': 'string' }
-                    }
-                },
-                'required': ['leads']
-            }
-        },
-        'required': ['context', 'stats', 'inventory', 'goals', 'assist']
-    }
-};
+const HUD_INSTRUCTION = `[HUD INSTRUCTION - ALWAYS FOLLOW]
+At the end of EVERY response, you MUST append a JSON block with the current game state. Use this EXACT format:
 
-const hudPrompt = `Analyze the current roleplay context and generate HUD state data as JSON. Include:
-- Context: current time, date, location, brief situation summary
-- Stats: energy (current/max), nourishment %, hydration %, hygiene %, physical/mental status
-- Inventory: money amount with currency, items being carried, notable nearby objects
-- Goals: 1-3 active goals with name, description, and deadline/countdown
-- Assist: 4 suggested action/dialogue options for the player`;
+\`\`\`hud
+{"context":{"time":"HH:MM AM/PM","date":"Day, DD/MM/YYYY","location":"Current location","brief":"1-2 sentence summary"},"stats":{"energy":"X/X","nourishment":"X%","hydration":"X%","hygiene":"X%","status":"Physical/mental state"},"inventory":{"money":"Amount Currency","carrying":"Items in pockets","nearbyObjects":"Notable items nearby"},"goals":[{"name":"Goal name","description":"Brief description","deadline":"Time left"}],"assist":{"leads":["Option 1","Option 2","Option 3","Option 4"]}}
+\`\`\`
+
+Keep the HUD data consistent with the narrative. Update values based on events in the roleplay.`;
 
 async function loadSettings() {
     extension_settings[extensionName] = extension_settings[extensionName] || {};
@@ -94,9 +31,14 @@ function onEnabledChange(event) {
     saveSettingsDebounced();
 }
 
-// --- NEW: Hàm xử lý khi bấm nút ---
 function onTestButtonClick() {
-    generateHudData();
+    const { chat } = SillyTavern.getContext();
+    if (chat && chat.length > 0) {
+        const lastMessage = chat[chat.length - 1];
+        if (lastMessage && !lastMessage.is_user) {
+            parseAndUpdateHud(lastMessage.mes);
+        }
+    }
 }
 
 function onTabClick(event) {
@@ -110,26 +52,19 @@ function onTabClick(event) {
     $(`#panel-${tabId}`).addClass("active");
 }
 
-async function generateHudData() {
-    const { generateQuietPrompt } = SillyTavern.getContext();
+function parseAndUpdateHud(message) {
+    const hudMatch = message.match(/```hud\s*([\s\S]*?)\s*```/);
     
-    try {
-        const rawResult = await generateQuietPrompt({
-            quietPrompt: hudPrompt,
-            jsonSchema: hudSchema,
-        });
-        
-        const parsed = JSON.parse(rawResult);
-        
-        if (parsed && Object.keys(parsed).length > 0) {
-            updateHudDisplay(parsed);
-            return parsed;
+    if (hudMatch) {
+        try {
+            const hudData = JSON.parse(hudMatch[1]);
+            updateHudDisplay(hudData);
+            return hudData;
+        } catch (e) {
+            console.error(`[${extensionName}] Failed to parse HUD JSON:`, e);
         }
-        return null;
-    } catch (error) {
-        console.error(`[${extensionName}] Lỗi generate HUD:`, error);
-        return null;
     }
+    return null;
 }
 
 function updateHudDisplay(data) {
@@ -180,6 +115,25 @@ function updateHudDisplay(data) {
     }
 }
 
+globalThis.simuHudInterceptor = function(chat, contextSize, abort, type) {
+    if (!extension_settings[extensionName]?.isEnabled) return;
+    if (type === 'quiet' || type === 'impersonate') return;
+    
+    const hudSystemMessage = {
+        is_user: false,
+        is_system: true,
+        name: 'System',
+        mes: HUD_INSTRUCTION,
+        send_date: Date.now()
+    };
+    
+    chat.push(hudSystemMessage);
+};
+
+function hideHudBlockFromMessage(message) {
+    return message.replace(/```hud\s*[\s\S]*?\s*```/g, '').trim();
+}
+
 jQuery(async () => {
     console.log(`[${extensionName}] Loading...`);
    
@@ -196,9 +150,22 @@ jQuery(async () => {
         const { eventSource, event_types } = SillyTavern.getContext();
         
         if (eventSource && event_types) {
-            eventSource.on(event_types.GENERATION_ENDED, () => {
+            eventSource.on(event_types.MESSAGE_RECEIVED, (messageId) => {
                 if (extension_settings[extensionName].isEnabled) {
-                    generateHudData();
+                    const { chat } = SillyTavern.getContext();
+                    if (chat && chat[messageId] && !chat[messageId].is_user) {
+                        parseAndUpdateHud(chat[messageId].mes);
+                        chat[messageId].mes = hideHudBlockFromMessage(chat[messageId].mes);
+                    }
+                }
+            });
+            
+            eventSource.on(event_types.MESSAGE_EDITED, (messageId) => {
+                if (extension_settings[extensionName].isEnabled) {
+                    const { chat } = SillyTavern.getContext();
+                    if (chat && chat[messageId] && !chat[messageId].is_user) {
+                        parseAndUpdateHud(chat[messageId].mes);
+                    }
                 }
             });
         }
