@@ -4,103 +4,91 @@ import { eventSource, event_types } from "../../../../script.js";
 const extensionName = "Simu-Hud"; 
 const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 
-// Khởi tạo dữ liệu trống
+// Khởi tạo dữ liệu nếu chưa có
 if (!extension_settings[extensionName]) {
     extension_settings[extensionName] = { data: {} };
 }
 
 function updateUIAndSave(d) {
     if (!d) return;
-    extension_settings[extensionName].data = Object.assign(extension_settings[extensionName].data, d);
+    // Gộp dữ liệu mới vào bộ nhớ
+    extension_settings[extensionName].data = { ...extension_settings[extensionName].data, ...d };
     const data = extension_settings[extensionName].data;
     
-    if (data.time) $("#sh_time").text(data.time);
-    if (data.date) $("#sh_date").text(data.date);
-    if (data.location) $("#sh_location").text(data.location);
-    if (data.brief) $("#sh_brief").text(data.brief);
-    if (data.status) $("#sh_status").text(data.status);
-    if (data.money) $("#sh_money").text(data.money);
-    if (data.carrying) $("#sh_carrying").text(data.carrying);
-    if (data.nearby) $("#sh_nearby").text(data.nearby);
-    if (data.goals) $("#sh_goals").text(data.goals);
-    if (data.leads) $("#sh_leads").text(data.leads);
+    // Cập nhật giao diện
+    $("#sh_time").text(data.time || "--:--");
+    $("#sh_date").text(data.date || "--");
+    $("#sh_location").text(data.location || "Unknown");
+    $("#sh_brief").text(data.brief || "Waiting for AI...");
+    $("#sh_status").text(data.status || "Healthy");
+    $("#sh_money").text(data.money || "0");
+    $("#sh_carrying").text(data.carrying || "Nothing");
+    $("#sh_goals").text(data.goals || "None");
+    $("#sh_leads").text(data.leads || "No leads.");
 
-    if (data.energy && data.energy_max) {
-        $("#sh_energy_val").text(`${data.energy}/${data.energy_max}`);
-        $("#sh_energy_bar").css("width", `${(data.energy/data.energy_max)*100}%`);
+    if (data.energy) {
+        $("#sh_energy_val").text(`${data.energy}/${data.energy_max || 100}`);
+        $("#sh_energy_bar").css("width", `${(data.energy / (data.energy_max || 100)) * 100}%`);
     }
-    if (data.nourishment !== undefined) {
+    if (data.nourishment) {
         $("#sh_nourish_val").text(data.nourishment + "%");
         $("#sh_nourish_bar").css("width", data.nourishment + "%");
     }
-    if (data.hydration !== undefined) {
+    if (data.hydration) {
         $("#sh_hydra_val").text(data.hydration + "%");
         $("#sh_hydra_bar").css("width", data.hydration + "%");
     }
-    if (data.hygiene !== undefined) {
-        // Nếu có hygiene thì thêm vào (tùy HTML của bạn)
-    }
+    console.log(`[${extensionName}] UI Updated.`);
 }
 
-// EXTENSION TỰ ĐỘNG TIÊM PROMPT (Thay thế hoàn toàn Preset của bạn)
+// HÀM QUAN TRỌNG: ÉP AI PHẢI ĐIỀN DATA
 eventSource.on("extension_prompt_roles", (prompt) => {
     const context = getContext();
     const isNewChat = context.chat.length <= 1; 
     const data = extension_settings[extensionName].data;
-    
-    // Khung JSON mẫu bắt buộc AI phải tuân theo
-    const jsonTemplate = `
-<simu-hud>
-{
-  "time": "...", "date": "...", "location": "...", "brief": "...",
-  "energy": 100, "energy_max": 100, "nourishment": 100, "hydration": 100, "hygiene": 100,
-  "status": "...", "money": "...", "carrying": "...", "nearby": "...",
-  "goals": "...", "leads": "..."
-}
-</simu-hud>`;
 
-    let injectionContent = `[SYSTEM: BACKGROUND SIMULATION MANAGER]\nYou are managing an RPG simulation in the background. Keep your narrative response immersive. `;
+    console.log(`[${extensionName}] 💉 ĐANG TIÊM PROMPT NGẦM...`);
 
+    let injection = `### [SYSTEM: SIMULATION ENGINE ACTIVE] ###\n`;
     if (isNewChat) {
-        // LƯỢT ĐẦU TIÊN: Yêu cầu AI tự động Generate dữ liệu khởi tạo
-        injectionContent += `For this new session or opening input, automatically INITIALIZE the simulation. Establish starting Date, Time, and exact Location based on lore. Set Energy to a logical number (Max 100). Set Nourishment, Hydration, Hygiene percentages logically. Assign Status, Money, Carrying, Nearby Objects, and Goals.\n`;
+        injection += `NEW SESSION DETECTED. Automatically INITIALIZE all RPG stats (Time, Location, Energy, Inventory, etc.) based on the lore.\n`;
     } else {
-        // TỪ LƯỢT THỨ 2: Gửi dữ liệu hiện tại để AI tính toán tiếp
-        injectionContent += `Current state:\n`;
-        injectionContent += `- Context: Time: ${data.time || "N/A"}, Date: ${data.date || "N/A"}, Location: ${data.location || "N/A"}\n`;
-        injectionContent += `- Stats: Energy: ${data.energy || 0}/${data.energy_max || 100}, Nourishment: ${data.nourishment || 0}%, Hydration: ${data.hydration || 0}%\n`;
-        injectionContent += `- Inventory: Money: ${data.money || "0"}, Carrying: ${data.carrying || "Nothing"}, Nearby: ${data.nearby || "Nothing"}\n`;
-        injectionContent += `- Goals: ${data.goals || "None"}\n`;
-        injectionContent += `Update these dynamically based on the latest narrative action.\n`;
+        injection += `CURRENT STATS: Time:${data.time}, Loc:${data.location}, Energy:${data.energy}%, Money:${data.money}.\n`;
     }
+    
+    injection += `At the end of your response, you MUST output the updated state inside <simu-hud>{ JSON }</simu-hud> tags. Use this exact JSON structure: {"time":"","date":"","location":"","brief":"","energy":100,"energy_max":100,"nourishment":100,"hydration":100,"status":"","money":"","carrying":"","nearby":"","goals":"","leads":""}\n`;
 
-    // Luật dập khuôn (Ép AI xuất JSON ẩn vào cuối)
-    injectionContent += `CRITICAL RULE: At the ABSOLUTE END of EVERY response, output the new state as a strict JSON block wrapped in <simu-hud> tags exactly like this template. Do NOT write any Markdown HUDs or stat blocks in the narrative text:\n${jsonTemplate}`;
-
+    // Đẩy thông tin này vào danh sách prompt gửi đi cho AI
     prompt.push({
         role: "system",
-        content: injectionContent
+        content: injection
     });
 });
 
-// Bắt và xử lý JSON ẩn
+// Bắt tin nhắn trả về
 function handleMessage() {
     const context = getContext();
     const lastMes = context.chat[context.chat.length - 1];
     if (!lastMes || lastMes.is_user) return;
 
+    console.log(`[${extensionName}] Đang quét tin nhắn tìm thẻ <simu-hud>...`);
     const regex = /<simu-hud>([\s\S]*?)<\/simu-hud>/i;
     const match = lastMes.mes.match(regex);
 
     if (match) {
         try {
             const parsedData = JSON.parse(match[1].trim());
+            console.log(`[${extensionName}] ✅ Đã thấy JSON! Cập nhật Menu ngay.`);
             updateUIAndSave(parsedData);
             
-            // Xóa sạch dấu vết
+            // Xóa tag khỏi khung chat để user không thấy
             lastMes.mes = lastMes.mes.replace(regex, "").trim();
             $(".mes_text:last").html(lastMes.mes.replace(/\n/g, "<br>"));
-        } catch (e) { console.error("[Simu-Hud] JSON Error", e); }
+        } catch (e) { 
+            console.error(`[${extensionName}] ❌ Lỗi đọc JSON. AI viết sai định dạng rôi!`, e); 
+        }
+    } else {
+        console.warn(`[${extensionName}] ⚠️ Không tìm thấy thẻ <simu-hud> trong câu trả lời của AI.`);
     }
 }
 
@@ -115,10 +103,7 @@ $(document).on("click", ".sh-tab", function() {
 jQuery(async () => {
     const html = await $.get(`${extensionFolderPath}/example.html`);
     $("#extensions_settings2").append(html);
-    
-    // Load dữ liệu cũ lên UI
     updateUIAndSave(extension_settings[extensionName].data);
-    
     eventSource.on(event_types.MESSAGE_RECEIVED, handleMessage);
-    console.log("[Simu-Hud] Ready - Extension handles all prompt logic.");
+    console.log("[Simu-Hud] Ready and Listening.");
 });
