@@ -1,83 +1,69 @@
-import { extension_settings, getContext } from "../../../extensions.js";
+import { getContext } from "../../../extensions.js";
 import { eventSource, event_types } from "../../../../script.js";
 
 const extensionName = "Simu-Hud"; 
 const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 
-// Hàm cập nhật giao diện hiển thị
-function updateHudData(parsedData) {
-    if (parsedData.time) $("#sh_time").text(parsedData.time);
-    if (parsedData.date) $("#sh_date").text(parsedData.date);
-    if (parsedData.location) $("#sh_location").text(parsedData.location);
-    if (parsedData.brief) $("#sh_brief").text(parsedData.brief);
-    
-    // Hiệu ứng chớp nhẹ khi cập nhật
-    $(".sh-highlight, .sh-brief-box").fadeOut(100).fadeIn(100);
-    console.log(`[${extensionName}] Data updated from AI:`, parsedData);
+function updateUI(d) {
+    if (!d) return;
+    // Cập nhật text
+    if (d.time) $("#sh_time").text(d.time);
+    if (d.date) $("#sh_date").text(d.date);
+    if (d.location) $("#sh_location").text(d.location);
+    if (d.brief) $("#sh_brief").text(d.brief);
+    if (d.status) $("#sh_status").text(d.status);
+    if (d.money) $("#sh_money").text(d.money);
+    if (d.carrying) $("#sh_carrying").text(d.carrying);
+    if (d.goals) $("#sh_goals").text(d.goals);
+    if (d.leads) $("#sh_leads").text(d.leads);
+
+    // Cập nhật Bars
+    if (d.energy && d.energy_max) {
+        $("#sh_energy_val").text(`${d.energy}/${d.energy_max}`);
+        $("#sh_energy_bar").css("width", `${(d.energy/d.energy_max)*100}%`);
+    }
+    if (d.nourishment) {
+        $("#sh_nourish_val").text(d.nourishment + "%");
+        $("#sh_nourish_bar").css("width", d.nourishment + "%");
+    }
+    if (d.hydration) {
+        $("#sh_hydra_val").text(d.hydration + "%");
+        $("#sh_hydra_bar").css("width", d.hydration + "%");
+    }
+    console.log("[Simu-Hud] UI Updated");
 }
 
-// Hệ thống Đọc và Xóa tin nhắn ẩn
-function onMessageReceived() {
-    // Lấy context chuẩn của SillyTavern để đọc tin nhắn
-    const context = getContext();
-    const chat = context.chat;
-    
-    // Lấy tin nhắn cuối cùng
-    const lastMessage = chat[chat.length - 1];
-    if (!lastMessage || lastMessage.is_user || !lastMessage.mes) return;
+function handleMessage() {
+    const chat = getContext().chat;
+    const lastMes = chat[chat.length - 1];
+    if (!lastMes || lastMes.is_user) return;
 
-    // Tìm khối <simu-hud> chứa code JSON
     const regex = /<simu-hud>([\s\S]*?)<\/simu-hud>/i;
-    const match = lastMessage.mes.match(regex);
+    const match = lastMes.mes.match(regex);
 
     if (match) {
         try {
-            // 1. Chuyển text thành dữ liệu JSON
-            const aiData = JSON.parse(match[1].trim());
+            const data = JSON.parse(match[1].trim());
+            updateUI(data);
             
-            // 2. Cập nhật Menu UI
-            updateHudData(aiData);
-
-            // 3. XÓA khối <simu-hud> khỏi dữ liệu gốc
-            lastMessage.mes = lastMessage.mes.replace(regex, "").trim();
-
-            // 4. Tìm phần tử HTML của tin nhắn đó trên màn hình và ẩn đoạn code đi
-            // getContext().chat không tự động update UI, nên ta phải tự xóa nó trên màn hình
-            const mesId = chat.length - 1; // ID tạm thời
-            const messageDom = $(`.mes_text:last`); 
-            if (messageDom.length) {
-                messageDom.html(lastMessage.mes.replace(/\n/g, "<br>")); 
-            }
-
-            console.log(`[${extensionName}] Đã trích xuất và xóa HUD code thành công.`);
-        } catch (error) {
-            console.error(`[${extensionName}] ❌ Lỗi khi đọc JSON từ AI:`, error);
-        }
+            // Xóa tag khỏi tin nhắn hiển thị
+            lastMes.mes = lastMes.mes.replace(regex, "").trim();
+            $(".mes_text:last").html(lastMes.mes.replace(/\n/g, "<br>"));
+        } catch (e) { console.error("[Simu-Hud] JSON Parse Error", e); }
     }
 }
 
-// Chuyển Tab
-function onTabClick(event) {
-    $(".simu-hud-tab").removeClass("active");
-    $(".simu-hud-tab-content").removeClass("active");
-    const clickedTab = $(event.currentTarget);
-    clickedTab.addClass("active");
-    const targetId = clickedTab.data("tab");
-    $(`#tab-${targetId}`).addClass("active");
-}
+// Logic chuyển tab
+$(document).on("click", ".sh-tab", function() {
+    $(".sh-tab").removeClass("active");
+    $(".sh-content").removeClass("active");
+    $(this).addClass("active");
+    $(`#sh-t-${$(this).data("tab")}`).addClass("active");
+});
 
 jQuery(async () => {
-    try {
-        const settingsHtml = await $.get(`${extensionFolderPath}/example.html`);
-        $("#extensions_settings2").append(settingsHtml);
-       
-        $(document).on("click", ".simu-hud-tab", onTabClick);
-       
-        // Lắng nghe sự kiện ngay sau khi AI trả lời xong
-        eventSource.on(event_types.MESSAGE_RECEIVED, onMessageReceived);
-       
-        console.log(`[${extensionName}] ✅ Ready. Đã sửa lỗi import. Lắng nghe tag <simu-hud>...`);
-    } catch (error) {
-        console.error(`[${extensionName}] ❌ Failed to load:`, error);
-    }
+    const html = await $.get(`${extensionFolderPath}/example.html`);
+    $("#extensions_settings2").append(html);
+    eventSource.on(event_types.MESSAGE_RECEIVED, handleMessage);
+    console.log("[Simu-Hud] Dashboard Loaded");
 });

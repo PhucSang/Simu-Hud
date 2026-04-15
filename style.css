@@ -1,67 +1,32 @@
-.simu-hud-tabs {
+.sh-tabs-container {
     display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
+    justify-content: space-between;
     margin-bottom: 15px;
-    border-bottom: 1px solid var(--SmartThemeBorderColor, #ccc);
+    border-bottom: 1px solid #555;
     padding-bottom: 5px;
 }
-
-.simu-hud-tab {
-    padding: 5px 10px;
+.sh-tab {
     cursor: pointer;
-    background: var(--SmartThemeQuoteColor, rgba(255,255,255,0.1));
-    border-radius: 5px;
-    font-size: 0.9em;
-    transition: background 0.2s;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    background: rgba(255,255,255,0.1);
 }
-
-.simu-hud-tab:hover {
-    background: var(--SmartThemeHoverColor, rgba(255,255,255,0.2));
-}
-
-.simu-hud-tab.active {
-    background: var(--SmartThemeBlurTintColor, rgba(0, 153, 255, 0.5));
+.sh-tab.active {
+    background: #0099ff;
+    color: white;
     font-weight: bold;
 }
-
-.simu-hud-tab-content {
-    display: none; /* Ẩn đi mặc định */
-    padding: 10px;
-    background: rgba(0,0,0,0.2);
-    border-radius: 5px;
-}
-
-.simu-hud-tab-content.active {
-    display: block; /* Chỉ hiện tab đang được chọn */
-}
-
-.simu-hud-form-group {
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
-}
-
-.simu-hud-form-group label {
-    font-size: 0.85em;
-    margin-bottom: 3px;
-    opacity: 0.8;
-}
-
-.simu-hud-form-group input, 
-.simu-hud-form-group textarea {
-    background: var(--SmartThemeQuoteColor, rgba(0,0,0,0.2));
-    color: var(--SmartThemeBodyColor, #fff);
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    padding: 6px;
+.sh-content { display: none; padding: 5px; }
+.sh-content.active { display: block; }
+.sh-box {
+    background: rgba(0,0,0,0.3);
+    padding: 8px;
+    margin-top: 5px;
     border-radius: 4px;
-    width: 100%;
-    box-sizing: border-box;
-    font-family: inherit;
+    font-style: italic;
+    font-size: 0.9em;
 }
-
-.simu-hud-form-group input:focus, 
-.simu-hud-form-group textarea:focus {
-    outline: none;
-    border-color: var(--SmartThemeBlurTintColor, #0099ff);
-}
+.sh-bar-bg { background: #222; height: 6px; border-radius: 3px; margin: 4px 0 10px 0; }
+.sh-bar { height: 100%; border-radius: 3px; transition: width 0.4s; }
+.sh-row { font-size: 0.85em; font-weight: bold; }

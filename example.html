@@ -1,14 +1,49 @@
-<div class="simu-hud-tab-content active" id="tab-context">
-                <h4>[CONTEXT & ENVIRONMENT]</h4>
-                
-                <div class="simu-hud-display-box">
-                    <p>🕒 <b>Time:</b> <span id="sh_time" class="sh-highlight">--:--</span></p>
-                    <p>📅 <b>Date:</b> <span id="sh_date" class="sh-highlight">--/--/----</span></p>
-                    <p>📍 <b>Location:</b> <span id="sh_location" class="sh-highlight">Unknown</span></p>
-                    <hr style="border-color: #555; margin: 10px 0;" />
-                    <p>📝 <b>Brief:</b></p>
-                    <div id="sh_brief" class="sh-brief-box">Waiting for AI to analyze the situation...</div>
-                </div>
-
-                <input id="test_ai_update_btn" class="menu_button" type="submit" value="[Test] Giả lập AI gửi data" style="margin-top: 15px;" />
+<div class="Simu-Hud-settings">
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b>Simu-Hud v2.0 (Active)</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content">
+            
+            <div class="sh-tabs-container">
+                <div class="sh-tab active" data-tab="context">Context</div>
+                <div class="sh-tab" data-tab="stats">Stats</div>
+                <div class="sh-tab" data-tab="items">Items</div>
+                <div class="sh-tab" data-tab="goals">Goals</div>
             </div>
+
+            <div class="sh-content active" id="sh-t-context">
+                <p>🕒 <b>Time:</b> <span id="sh_time">--:--</span></p>
+                <p>📅 <b>Date:</b> <span id="sh_date">--</span></p>
+                <p>📍 <b>Location:</b> <span id="sh_location">Unknown</span></p>
+                <div id="sh_brief" class="sh-box">Waiting for AI...</div>
+            </div>
+            
+            <div class="sh-content" id="sh-t-stats">
+                <div class="sh-row">⚡ Energy: <span id="sh_energy_val">0/0</span></div>
+                <div class="sh-bar-bg"><div id="sh_energy_bar" class="sh-bar" style="width:0%; background:#ffcc00;"></div></div>
+                
+                <div class="sh-row">🍖 Nourishment: <span id="sh_nourish_val">0%</span></div>
+                <div class="sh-bar-bg"><div id="sh_nourish_bar" class="sh-bar" style="width:0%; background:#ff6600;"></div></div>
+
+                <div class="sh-row">💧 Hydration: <span id="sh_hydra_val">0%</span></div>
+                <div class="sh-bar-bg"><div id="sh_hydra_bar" class="sh-bar" style="width:0%; background:#0099ff;"></div></div>
+                
+                <p>🧘 <b>Status:</b> <span id="sh_status">Healthy</span></p>
+            </div>
+
+            <div class="sh-content" id="sh-t-items">
+                <p>💰 <b>Money:</b> <span id="sh_money">0</span></p>
+                <div id="sh_carrying" class="sh-box">Empty</div>
+            </div>
+
+            <div class="sh-content" id="sh-t-goals">
+                <div id="sh_goals" class="sh-box">None</div>
+                <hr />
+                <div id="sh_leads" class="sh-box" style="color:#aaa">No leads.</div>
+            </div>
+
+        </div>
+    </div>
+</div>
