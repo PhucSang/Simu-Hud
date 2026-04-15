@@ -3,7 +3,8 @@
     top: 100px;
     left: 100px;
     width: 350px;
-    z-index: 10000;
+    max-width: 90vw;
+    z-index: 999999;
     border: 1px solid var(--SmartThemeBorderColor, #3c3c3c);
     border-radius: 8px;
     overflow: hidden;
@@ -124,15 +125,15 @@
 /* --- Nút Bong bóng nổi (Bubble Icon) --- */
 #simu-hud-fab {
     position: fixed;
-    bottom: 30px;
-    right: 30px;
+    bottom: 120px;
+    right: 20px;
     width: 50px;
     height: 50px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 50%;
     box-shadow: 0 4px 10px rgba(0,0,0,0.4);
     cursor: pointer;
-    z-index: 9999;
+    z-index: 999999;
     display: flex;
     align-items: center;
     justify-content: center;
