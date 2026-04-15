@@ -8,15 +8,6 @@ const defaultSettings = {
     isEnabled: true,
 };
 
-const HUD_INSTRUCTION = `[HUD INSTRUCTION - ALWAYS FOLLOW]
-At the end of EVERY response, you MUST append a JSON block with the current game state. Use this EXACT format:
-
-\`\`\`hud
-{"context":{"time":"HH:MM AM/PM","date":"Day, DD/MM/YYYY","location":"Current location","brief":"1-2 sentence summary"},"stats":{"energy":"X/X","nourishment":"X%","hydration":"X%","hygiene":"X%","status":"Physical/mental state"},"inventory":{"money":"Amount Currency","carrying":"Items in pockets","nearbyObjects":"Notable items nearby"},"goals":[{"name":"Goal name","description":"Brief description","deadline":"Time left"}],"assist":{"leads":["Option 1","Option 2","Option 3","Option 4"]}}
-\`\`\`
-
-Keep the HUD data consistent with the narrative. Update values based on events in the roleplay.`;
-
 async function loadSettings() {
     extension_settings[extensionName] = extension_settings[extensionName] || {};
     if (Object.keys(extension_settings[extensionName]).length === 0) {
@@ -124,18 +115,7 @@ function sendLead(leadText) {
 }
 
 globalThis.simuHudInterceptor = function(chat, contextSize, abort, type) {
-    if (!extension_settings[extensionName]?.isEnabled) return;
-    if (type === 'quiet' || type === 'impersonate') return;
-    
-    const hudSystemMessage = {
-        is_user: false,
-        is_system: true,
-        name: 'System',
-        mes: HUD_INSTRUCTION,
-        send_date: Date.now()
-    };
-    
-    chat.push(hudSystemMessage);
+    return;
 };
 
 function hideHudBlockFromMessage(message) {
