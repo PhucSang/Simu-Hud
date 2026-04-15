@@ -193,12 +193,21 @@ jQuery(async () => {
         const settingsHtml = await $.get(`${extensionFolderPath}/example.html`);
         $("#extensions_settings2").append(settingsHtml);
        
-        // Bind sự kiện
         $(document).on("input", "#simu_hud_enabled", onEnabledChange);
         $(document).on("click", "#simu_hud_test_btn", onTestButtonClick);
         $(document).on("click", ".simu-hud-tab", onTabClick);
        
         await loadSettings();
+       
+        const { eventSource, event_types } = SillyTavern.getContext();
+        
+        if (eventSource && event_types) {
+            eventSource.on(event_types.MESSAGE_RECEIVED, async () => {
+                if (extension_settings[extensionName].isEnabled) {
+                    await generateHudData();
+                }
+            });
+        }
        
         console.log(`[${extensionName}] ✅ Loaded successfully`);
     } catch (error) {
