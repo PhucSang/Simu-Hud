@@ -9,13 +9,13 @@ const defaultSettings = {
 };
 
 const HUD_INSTRUCTION = `[HUD INSTRUCTION - ALWAYS FOLLOW]
-At the end of EVERY response, you MUST append a JSON block with the current game state. Use this EXACT format:
+At the absolute end of EVERY single response, you MUST append a JSON block with the current game state. Use this EXACT format:
 
 \`\`\`hud
 {"context":{"time":"HH:MM AM/PM","date":"Day, DD/MM/YYYY","location":"Current location","brief":"1-2 sentence summary"},"stats":{"energy":"X/X","nourishment":"X%","hydration":"X%","hygiene":"X%","status":"Physical/mental state"},"inventory":{"money":"Amount Currency","carrying":"Items in pockets","nearbyObjects":"Notable items nearby"},"goals":[{"name":"Goal name","description":"Brief description","deadline":"Time left"}],"assist":{"leads":["Option 1","Option 2","Option 3","Option 4"]}}
 \`\`\`
 
-Keep the HUD data consistent with the narrative. Update values based on events in the roleplay.`;
+Keep the HUD data consistent`;
 
 async function loadSettings() {
     extension_settings[extensionName] = extension_settings[extensionName] || {};
