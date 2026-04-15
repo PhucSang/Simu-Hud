@@ -121,6 +121,15 @@ function sendLead(leadText) {
     $("#send_but").click();
 }
 
+function toggleHudOverlay() {
+    const overlay = $("#simu-hud-overlay");
+    overlay.toggleClass("active");
+}
+
+function closeHudOverlay() {
+    $("#simu-hud-overlay").removeClass("active");
+}
+
 globalThis.simuHudInterceptor = function(chat, contextSize, abort, type) {
     if (!extension_settings[extensionName]?.isEnabled) return;
     if (type === 'quiet' || type === 'impersonate') return;
@@ -150,6 +159,13 @@ jQuery(async () => {
             const leadText = $(this).data('lead');
             if (leadText) {
                 sendLead(leadText);
+            }
+        });
+        $(document).on("click", "#simu-hud-floating-btn", toggleHudOverlay);
+        $(document).on("click", "#simu-hud-close-btn", closeHudOverlay);
+        $(document).on("click", "#simu-hud-overlay", function(e) {
+            if (e.target.id === "simu-hud-overlay") {
+                closeHudOverlay();
             }
         });
        

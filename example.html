@@ -17,50 +17,53 @@
             </div>
 
             <p><small>Bấm nút trên để xem thông báo popup của SillyTavern.</small></p>
+        </div>
+    </div>
+</div>
 
-            <hr />
+<div id="simu-hud-floating-btn" class="simu-hud-floating-btn" title="Simu-Hud Menu">
+    <i class="fa-solid fa-gamepad"></i>
+</div>
 
-            <div class="simu-hud-menu">
-                <div class="simu-hud-header">MENU</div>
-                <nav class="simu-hud-nav">
-                    <button class="simu-hud-tab active" data-tab="context">CONTEXT & ENVIRONMENT</button>
-                    <button class="simu-hud-tab" data-tab="stats">BASIC STATS & CONDITION</button>
-                    <button class="simu-hud-tab" data-tab="inventory">INVENTORY & SURROUNDINGS</button>
-                    <button class="simu-hud-tab" data-tab="goals">ACTIVE GOALS</button>
-                    <button class="simu-hud-tab" data-tab="assist">SYSTEM ASSIST</button>
-                </nav>
-                <div class="simu-hud-content">
-                    <div class="simu-hud-panel active" id="panel-context">
-                        <div class="stat-row"><span class="stat-label">Time:</span><span class="stat-value">[HH:MM AM/PM]</span></div>
-                        <div class="stat-row"><span class="stat-label">Date:</span><span class="stat-value">[Weekday], [DD/MM/YYYY]</span></div>
-                        <div class="stat-row"><span class="stat-label">Location:</span><span class="stat-value">[Current specific room or area]</span></div>
-                        <div class="stat-row"><span class="stat-label">Brief:</span><span class="stat-value">[1-2 sentences summarizing the current situation]</span></div>
-                    </div>
-                    <div class="simu-hud-panel" id="panel-stats">
-                        <div class="stat-row"><span class="stat-label">Energy:</span><span class="stat-value">[Current]/[Max]</span></div>
-                        <div class="stat-row"><span class="stat-label">Nourishment:</span><span class="stat-value">[X]%</span></div>
-                        <div class="stat-row"><span class="stat-label">Hydration:</span><span class="stat-value">[X]%</span></div>
-                        <div class="stat-row"><span class="stat-label">Hygiene:</span><span class="stat-value">[X]%</span></div>
-                        <div class="stat-row"><span class="stat-label">Status:</span><span class="stat-value">[Healthy, Exhausted, etc.]</span></div>
-                    </div>
-                    <div class="simu-hud-panel" id="panel-inventory">
-                        <div class="stat-row"><span class="stat-label">Money:</span><span class="stat-value">[Amount] [Currency]</span></div>
-                        <div class="stat-row"><span class="stat-label">Carrying:</span><span class="stat-value">[Key items currently holding]</span></div>
-                        <div class="stat-row"><span class="stat-label">Nearby Objects:</span><span class="stat-value">[Notable items nearby]</span></div>
-                    </div>
-                    <div class="simu-hud-panel" id="panel-goals">
-                        <div class="stat-row"><span class="stat-label">Goal 1:</span><span class="stat-value">[Description & status] ([Deadline])</span></div>
-                        <div class="stat-row"><span class="stat-label">Goal 2:</span><span class="stat-value">[Description & status] ([Deadline])</span></div>
-                        <div class="stat-row"><span class="stat-label">Goal 3:</span><span class="stat-value">[Description & status] ([Deadline])</span></div>
-                    </div>
-                    <div class="simu-hud-panel" id="panel-assist">
-                        <div class="stat-row"><span class="stat-label">Leads:</span></div>
-                        <div class="lead-item">1. [Action/Dialogue option 1]</div>
-                        <div class="lead-item">2. [Action/Dialogue option 2]</div>
-                        <div class="lead-item">3. [Action/Dialogue option 3]</div>
-                        <div class="lead-item">4. [Action/Dialogue option 4]</div>
-                    </div>
-                </div>
+<div id="simu-hud-overlay" class="simu-hud-overlay">
+    <div class="simu-hud-modal">
+        <div class="simu-hud-modal-header">
+            <span class="simu-hud-modal-title">SIMU-HUD</span>
+            <button class="simu-hud-close-btn" id="simu-hud-close-btn">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <nav class="simu-hud-nav">
+            <button class="simu-hud-tab active" data-tab="context">CONTEXT</button>
+            <button class="simu-hud-tab" data-tab="stats">STATS</button>
+            <button class="simu-hud-tab" data-tab="inventory">INVENTORY</button>
+            <button class="simu-hud-tab" data-tab="goals">GOALS</button>
+            <button class="simu-hud-tab" data-tab="assist">ASSIST</button>
+        </nav>
+        <div class="simu-hud-content">
+            <div class="simu-hud-panel active" id="panel-context">
+                <div class="stat-row"><span class="stat-label">Time:</span><span class="stat-value">--:-- --</span></div>
+                <div class="stat-row"><span class="stat-label">Date:</span><span class="stat-value">--, --/--/----</span></div>
+                <div class="stat-row"><span class="stat-label">Location:</span><span class="stat-value">Unknown</span></div>
+                <div class="stat-row"><span class="stat-label">Brief:</span><span class="stat-value">No information</span></div>
+            </div>
+            <div class="simu-hud-panel" id="panel-stats">
+                <div class="stat-row"><span class="stat-label">Energy:</span><span class="stat-value">--/--</span></div>
+                <div class="stat-row"><span class="stat-label">Nourishment:</span><span class="stat-value">--%</span></div>
+                <div class="stat-row"><span class="stat-label">Hydration:</span><span class="stat-value">--%</span></div>
+                <div class="stat-row"><span class="stat-label">Hygiene:</span><span class="stat-value">--%</span></div>
+                <div class="stat-row"><span class="stat-label">Status:</span><span class="stat-value">Unknown</span></div>
+            </div>
+            <div class="simu-hud-panel" id="panel-inventory">
+                <div class="stat-row"><span class="stat-label">Money:</span><span class="stat-value">0</span></div>
+                <div class="stat-row"><span class="stat-label">Carrying:</span><span class="stat-value">Nothing</span></div>
+                <div class="stat-row"><span class="stat-label">Nearby Objects:</span><span class="stat-value">None</span></div>
+            </div>
+            <div class="simu-hud-panel" id="panel-goals">
+                <div class="stat-row"><span class="stat-value">None</span></div>
+            </div>
+            <div class="simu-hud-panel" id="panel-assist">
+                <div class="stat-row"><span class="stat-label">Leads:</span></div>
             </div>
         </div>
     </div>
