@@ -84,16 +84,24 @@
 }
 
 .lead-item {
-    padding: 6px 8px;
+    padding: 8px 10px;
     margin: 4px 0;
     background: rgba(102, 126, 234, 0.15);
     border-radius: 4px;
     color: var(--SmartThemeBodyColor, #ccc);
     font-size: 12px;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
 }
 
 .lead-item:hover {
-    background: rgba(102, 126, 234, 0.3);
+    background: rgba(102, 126, 234, 0.35);
+    border-color: #667eea;
+    color: #fff;
+}
+
+.lead-item:active {
+    background: rgba(102, 126, 234, 0.5);
+    transform: scale(0.98);
 }

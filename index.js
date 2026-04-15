@@ -110,8 +110,19 @@ function updateHudDisplay(data) {
         assistPanel.empty();
         assistPanel.append(`<div class="stat-row"><span class="stat-label">Leads:</span></div>`);
         data.assist.leads.forEach((lead, index) => {
-            assistPanel.append(`<div class="lead-item">${index + 1}. ${lead}</div>`);
+            const leadItem = $(`<div class="lead-item">${index + 1}. ${lead}</div>`);
+            leadItem.on('click', () => sendLead(lead));
+            assistPanel.append(leadItem);
         });
+    }
+}
+
+function sendLead(leadText) {
+    const { send_textarea, send_but } = SillyTavern.getContext();
+    
+    if (send_textarea && send_but) {
+        send_textarea.val(leadText);
+        send_but.click();
     }
 }
 
@@ -156,6 +167,19 @@ jQuery(async () => {
                     if (chat && chat[messageId] && !chat[messageId].is_user) {
                         parseAndUpdateHud(chat[messageId].mes);
                         chat[messageId].mes = hideHudBlockFromMessage(chat[messageId].mes);
+                    }
+                }
+            });
+            
+            eventSource.on(event_types.CHARACTER_MESSAGE_RENDERED, (messageId) => {
+                if (extension_settings[extensionName].isEnabled) {
+                    const mesBlock = $(`#chat .mes[mesid="${messageId}"]`);
+                    if (mesBlock.length) {
+                        const mesText = mesBlock.find('.mes_text');
+                        if (mesText.length) {
+                            const cleaned = hideHudBlockFromMessage(mesText.html());
+                            mesText.html(cleaned);
+                        }
                     }
                 }
             });
