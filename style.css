@@ -1,9 +1,19 @@
 .simu-hud-menu {
-    margin-top: 10px;
+    position: fixed;
+    top: 100px;
+    left: 100px;
+    width: 350px;
+    z-index: 10000;
     border: 1px solid var(--SmartThemeBorderColor, #3c3c3c);
     border-radius: 8px;
     overflow: hidden;
     background: var(--SmartThemeBlurTintColor, #1a1a1a);
+    display: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.simu-hud-menu.show {
+    display: block;
 }
 
 .simu-hud-header {
@@ -14,6 +24,11 @@
     font-weight: bold;
     font-size: 16px;
     letter-spacing: 2px;
+    cursor: grab;
+}
+
+.simu-hud-header:active {
+    cursor: grabbing;
 }
 
 .simu-hud-nav {
@@ -104,4 +119,30 @@
 .lead-item:active {
     background: rgba(102, 126, 234, 0.5);
     transform: scale(0.98);
+}
+
+/* --- Nút Bong bóng nổi (Bubble Icon) --- */
+#simu-hud-fab {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    cursor: pointer;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    user-select: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#simu-hud-fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.6);
 }

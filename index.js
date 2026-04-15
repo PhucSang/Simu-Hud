@@ -149,6 +149,38 @@ jQuery(async () => {
         const settingsHtml = await $.get(`${extensionFolderPath}/example.html`);
         $("#extensions_settings2").append(settingsHtml);
        
+        // Đưa HUD menu ra khỏi phần extension setting để hiển thị đè lên toàn màn hình
+        $(".simu-hud-menu").appendTo("body");
+
+        // Tạo và thêm nút Bubble (Floating Action Button) vào màn hình
+        const fabHtml = `
+            <div id="simu-hud-fab" title="Bật/Tắt Simu-Hud">
+                <i class="fa-solid fa-gamepad"></i>
+            </div>
+        `;
+        $("body").append(fabHtml);
+
+        // Kích hoạt tính năng kéo thả (draggable) của jQuery UI cho bong bóng
+        $("#simu-hud-fab").draggable({
+            containment: "window",
+            scroll: false,
+            distance: 5 // Tránh xung đột việc nhận nhầm click khi đang cố kéo
+        });
+
+        // Kích hoạt kéo thả cho cửa sổ HUD (kéo qua khu vực header)
+        $(".simu-hud-menu").draggable({
+            handle: ".simu-hud-header",
+            containment: "window",
+            scroll: false
+        });
+
+        // Sự kiện Bật/Tắt HUD khi bấm vào bong bóng
+        $(document).on("click", "#simu-hud-fab", function() {
+            // Nếu vừa kéo nút xong thì bỏ qua sự kiện click
+            if ($(this).hasClass("ui-draggable-dragging")) return;
+            $(".simu-hud-menu").toggleClass("show");
+        });
+
         $(document).on("input", "#simu_hud_enabled", onEnabledChange);
         $(document).on("click", "#simu_hud_test_btn", onTestButtonClick);
         $(document).on("click", ".simu-hud-tab", onTabClick);
