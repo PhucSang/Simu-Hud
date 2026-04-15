@@ -1,22 +1,22 @@
-<!-- You might want to add additional HTML elements to ST. 
-    It's good practice to separate it out from your code -->
-<div class="example-extension-settings">
+<div class="Simu-Hud-settings">
     <div class="inline-drawer">
         <div class="inline-drawer-toggle inline-drawer-header">
-            <b>Extension Example</b>
+            <b>Simu-Hud</b>
             <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
         </div>
         <div class="inline-drawer-content">
-            <div class="example-extension_block flex-container">
-                <input id="my_button" class="menu_button" type="submit" value="Example Button" />
+            <div class="flex-container justify-content-between">
+                <label for="simu_hud_enabled">Kích hoạt Simu-Hud</label>
+                <input id="simu_hud_enabled" type="checkbox" />
+            </div>
+            
+            <hr />
+
+            <div class="flex-container">
+                <input id="simu_hud_test_btn" class="menu_button" type="submit" value="Kiểm tra trạng thái" />
             </div>
 
-            <div class="example-extension_block flex-container">
-                <input id="example_setting" type="checkbox" />
-                <label for="example_setting">This is an example</label>
-            </div>
-
-            <hr class="sysHR" />
+            <p><small>Bấm nút trên để xem thông báo popup của SillyTavern.</small></p>
         </div>
     </div>
 </div>
