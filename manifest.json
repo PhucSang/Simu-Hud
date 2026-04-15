@@ -1,11 +1,8 @@
 {
-    "display_name": "Simu-Hud",
-    "loading_order": 9,
-    "requires": [],
-    "optional": [],
-    "js": "index.js",
-    "css": "style.css",
-    "author": "Snagas",
+    "name": "Simu-Hud",
+    "display_name": "Simu-Hud Dashboard",
     "version": "1.0.0",
-    "homePage": "https://github.com/PhucSang/Simu-Hud"
+    "description": "Hệ thống Dashboard RPG tự động cập nhật ngầm.",
+    "author": "Max & Gemini",
+    "entrypoint": "index.js"
 }

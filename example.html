@@ -1,22 +1,50 @@
 <div class="Simu-Hud-settings">
     <div class="inline-drawer">
         <div class="inline-drawer-toggle inline-drawer-header">
-            <b>Simu-Hud</b>
+            <b>Simu-Hud Dashboard (Quiet Mode)</b>
             <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
         </div>
         <div class="inline-drawer-content">
-            <div class="flex-container justify-content-between">
-                <label for="simu_hud_enabled">Kích hoạt Simu-Hud</label>
-                <input id="simu_hud_enabled" type="checkbox" />
+            
+            <div class="sh-tabs-container">
+                <div class="sh-tab active" data-tab="context">Context</div>
+                <div class="sh-tab" data-tab="stats">Stats</div>
+                <div class="sh-tab" data-tab="items">Items</div>
+                <div class="sh-tab" data-tab="goals">Goals</div>
+            </div>
+
+            <div class="sh-content active" id="sh-t-context">
+                <p>🕒 <b>Time:</b> <span id="sh_time">--:--</span></p>
+                <p>📅 <b>Date:</b> <span id="sh_date">--</span></p>
+                <p>📍 <b>Location:</b> <span id="sh_location">Unknown</span></p>
+                <div id="sh_brief" class="sh-box">Waiting for Quiet Sync...</div>
             </div>
             
-            <hr />
+            <div class="sh-content" id="sh-t-stats">
+                <div class="sh-row">⚡ Energy: <span id="sh_energy_val">0/0</span></div>
+                <div class="sh-bar-bg"><div id="sh_energy_bar" class="sh-bar" style="width:0%; background:#ffcc00;"></div></div>
+                
+                <div class="sh-row">🍖 Nourishment: <span id="sh_nourish_val">0%</span></div>
+                <div class="sh-bar-bg"><div id="sh_nourish_bar" class="sh-bar" style="width:0%; background:#ff6600;"></div></div>
 
-            <div class="flex-container">
-                <input id="simu_hud_test_btn" class="menu_button" type="submit" value="Kiểm tra trạng thái" />
+                <div class="sh-row">💧 Hydration: <span id="sh_hydra_val">0%</span></div>
+                <div class="sh-bar-bg"><div id="sh_hydra_bar" class="sh-bar" style="width:0%; background:#0099ff;"></div></div>
+                
+                <p>🧘 <b>Status:</b> <span id="sh_status">Normal</span></p>
             </div>
 
-            <p><small>Bấm nút trên để xem thông báo popup của SillyTavern.</small></p>
+            <div class="sh-content" id="sh-t-items">
+                <p>💰 <b>Money:</b> <span id="sh_money">0</span></p>
+                <div id="sh_carrying" class="sh-box">Nothing</div>
+                <p>🔍 <b>Nearby:</b> <span id="sh_nearby">Nothing</span></p>
+            </div>
+
+            <div class="sh-content" id="sh-t-goals">
+                <div id="sh_goals" class="sh-box">None</div>
+                <hr style="opacity:0.2" />
+                <div id="sh_leads" class="sh-box" style="color:#aaa">No leads.</div>
+            </div>
+
         </div>
     </div>
 </div>

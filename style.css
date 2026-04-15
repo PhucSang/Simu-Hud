@@ -1,0 +1,31 @@
+.sh-tabs-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.sh-tab {
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 4px 4px 0 0;
+    font-size: 0.85em;
+    background: rgba(255,255,255,0.05);
+}
+.sh-tab.active {
+    background: var(--SmartThemeBlurTintColor, #0099ff);
+    color: white;
+}
+.sh-content { display: none; padding: 5px; }
+.sh-content.active { display: block; }
+.sh-box {
+    background: rgba(0,0,0,0.2);
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    font-style: italic;
+    white-space: pre-wrap;
+}
+.sh-bar-bg { background: #111; height: 6px; border-radius: 3px; margin: 5px 0 12px 0; }
+.sh-bar { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+.sh-row { font-size: 0.85em; font-weight: bold; }
