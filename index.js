@@ -38,11 +38,12 @@ function onMessageReceived() {
             // 3. XÓA khối <simu-hud> khỏi tin nhắn để giấu nó đi
             lastMessage.mes = lastMessage.mes.replace(regex, "").trim();
 
-            // 4. Kích hoạt event của Silly Tavern để ST tự động render lại UI an toàn
-            // Việc này sẽ giữ nguyên được định dạng Markdown của AI thay vì làm hỏng DOM
+            // 4. Tìm phần tử HTML của tin nhắn đó trên màn hình và xóa nó (thay bằng text narrative)
             const mesId = lastMessage.mesId;
-            if (event_types.MESSAGE_UPDATED) {
-                eventSource.emit(event_types.MESSAGE_UPDATED, mesId);
+            const messageDom = $(`.mes[mesid="${mesId}"] .mes_text`);
+            if (messageDom.length) {
+                // Tạm thời hiển thị text dạng cơ bản (Sẽ render lại markdown chuẩn khi refresh)
+                messageDom.html(lastMessage.mes.replace(/\n/g, "<br>")); 
             }
 
             console.log(`[${extensionName}] Đã trích xuất và xóa HUD code thành công.`);

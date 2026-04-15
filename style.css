@@ -36,7 +36,32 @@
     display: block; /* Chỉ hiện tab đang được chọn */
 }
 
-/* Ẩn hoàn toàn thẻ simu-hud trên màn hình chat để không vỡ giao diện */
-simu-hud {
-    display: none !important;
+.simu-hud-form-group {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.simu-hud-form-group label {
+    font-size: 0.85em;
+    margin-bottom: 3px;
+    opacity: 0.8;
+}
+
+.simu-hud-form-group input, 
+.simu-hud-form-group textarea {
+    background: var(--SmartThemeQuoteColor, rgba(0,0,0,0.2));
+    color: var(--SmartThemeBodyColor, #fff);
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    padding: 6px;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.simu-hud-form-group input:focus, 
+.simu-hud-form-group textarea:focus {
+    outline: none;
+    border-color: var(--SmartThemeBlurTintColor, #0099ff);
 }
